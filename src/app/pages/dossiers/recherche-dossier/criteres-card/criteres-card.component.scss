@@ -1,0 +1,46 @@
+$mat-select-arrow-size: 5px !default;
+$mat-select-arrow-margin-width: 15px !default;
+$mat-select-arrow-margin-height: 4px !default;
+
+.mat-select-arrow-wrapper {
+  width: 0;
+  height: 0;
+  margin: $mat-select-arrow-margin-height $mat-select-arrow-margin-width;
+  display: table;
+}
+
+.mat-select-arrow-down {
+  border-left: $mat-select-arrow-size solid transparent;
+  border-right: $mat-select-arrow-size solid transparent;
+  border-top: $mat-select-arrow-size solid;
+}
+
+.mat-select-arrow-up {
+  border-top: 0px;
+  border-left: $mat-select-arrow-size solid transparent;
+  border-right: $mat-select-arrow-size solid transparent;
+  border-bottom: $mat-select-arrow-size solid;
+}
+
+.siga-spacing-bottom {
+  margin-bottom: 15px !important;
+}
+
+.siga-uppercase-input {
+  text-transform:uppercase;
+}
+
+.siga-hidden {
+  visibility: hidden !important;
+}
+
+/*
+ * Temporary
+ */
+ .temp {
+  &-fix-error-display {
+    ::ng-deep .mat-form-field-subscript-wrapper {
+      min-width: 200px;
+    }
+  }  
+}

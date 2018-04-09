@@ -1,0 +1,21 @@
+<siga-criteres-card [depts]="depts" [thematiques]="thematiques" [responsablesTech]="responsablesTech" (searchEventEmitter)="fetchResultatRecherche($event)">
+</siga-criteres-card>
+
+<div *ngIf="searchDone">
+  <ba-card>
+    <mat-paginator [length]="nbTotalElements" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOption" [pageIndex]="indexCurrentPage"
+      (page)="getNumberPage($event)">
+    </mat-paginator>
+    <ng2-smart-table [settings]="settings" [source]="source" (userRowSelect)="onTableRowClick($event)"></ng2-smart-table>
+  </ba-card>
+</div>
+<div>
+  <ba-card>
+    <!--     <mat-paginator [length]="nbTotalElements" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOption" [pageIndex]="indexCurrentPage"
+      (page)="getNumberPage($event)">
+    </mat-paginator> -->
+    <ng2-smart-table [settings]="settingsAmounts" [source]="data" (deleteConfirm)="onDeleteConfirm($event)" (createConfirm)="create($event)"
+      (editConfirm)="update($event)" (edit)="edit($event)"></ng2-smart-table>
+    <ng2-smart-table [settings]="settingsTotals" [source]="totalsSource"></ng2-smart-table>
+  </ba-card>
+</div>

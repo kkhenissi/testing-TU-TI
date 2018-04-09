@@ -1,0 +1,106 @@
+<div class="content">
+
+  <form novalidate [formGroup]="formPrevisionnel" (keydown.enter)="$event.preventDefault()">
+
+    <div fxLayout="column" fxLayoutAlign="space-between stretch">
+
+      <div fxLayout="row" fxLayoutAlign="space-between">
+
+        <!-- Priorité -->
+        <mat-form-field fxFlex="40">
+          <div fxLayout="row">
+            <input matInput placeholder="Niveau priorité" [matAutocomplete]="niveauPrioriteAutoComplete" formControlName="priorite" tabindex="10">
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !niveauPrioriteAutoComplete.isOpen, 'mat-select-arrow-up': niveauPrioriteAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="prioriteControl.value && !viewRight" matSuffix mat-icon-button aria-label="Clear" (click)="prioriteControl.setValue(null)">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!prioriteControl.hasError('required') && prioriteControl.touched && prioriteControl.hasError(prioriteValidatorKey)">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-autocomplete #niveauPrioriteAutoComplete="matAutocomplete" [displayWith]="displayNiveauPriorite" [autoActiveFirstOption]="true"
+          (optionSelected)="onPrioSelect($event)">
+          <mat-option *ngFor="let niveauPriorite of filteredPriorites | async" [value]="niveauPriorite">
+            <span> {{niveauPriorite.code}}</span>
+            <span>-</span>
+            <span> {{niveauPriorite.libelle}}</span>
+          </mat-option>
+        </mat-autocomplete>
+
+        <div fxFlex="7" fxLayoutAlign="end center" class="session-type">
+          <span>{{ sessionType }}</span>
+        </div>
+
+        <!-- Année -->
+        <mat-form-field fxFlex="10" class="temp-fix-error-display">
+          <input matInput autocomplete="off" [min]="datePickerConfig.minDate" [max]="datePickerConfig.maxDate" [matDatepicker]="dp"
+            placeholder="Année" minlength="4" maxlength="4" formControlName="annee" tabindex="11" (dateInput)="onAnneeInputChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler($event, dp)">
+          </mat-datepicker>
+          <mat-error *ngIf="anneeControl.hasError('minlength')">
+            <strong>
+              Veuillez renseigner une année sur 4 chiffres.
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="anneeControl.hasError('matDatepickerParse')">
+            <strong>
+              Veuillez sélectionner / saisir une année valide.
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="anneeControl.hasError('matDatepickerMin')">
+            <strong>
+              Veuillez saisir une année supérieure à 1950.
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="anneeControl.hasError('matDatepickerMax')">
+            <strong>
+              Veuillez saisir une année inférieure à 2050.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <div fxFlex="3">
+        </div>
+
+        <!-- Session -->
+        <mat-form-field fxFlex="40">
+          <div fxLayout="row">
+            <input matInput placeholder="Session Decision" [matAutocomplete]="sessionDecisionAutoComplete" formControlName="session"
+              tabindex="12">
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !sessionDecisionAutoComplete.isOpen, 'mat-select-arrow-up': sessionDecisionAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="sessionControl.value && !viewRight" matSuffix mat-icon-button aria-label="Clear" (click)="sessionControl.setValue(null)">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!sessionControl.hasError('required') && sessionControl.touched && sessionControl.hasError(sessionValidatorKey)">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-autocomplete #sessionDecisionAutoComplete="matAutocomplete" [displayWith]="displaySessionDecision" (optionSelected)="onSessionSelect($event)"
+          [autoActiveFirstOption]="true">
+          <mat-option *ngFor="let sessionDecision of filteredSessions | async" [value]="sessionDecision">
+            <span> {{sessionDecision.annee}}</span>
+            <span>-</span>
+            <span> {{sessionDecision.numero}} </span>
+          </mat-option>
+        </mat-autocomplete>
+
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

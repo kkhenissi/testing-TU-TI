@@ -1,0 +1,202 @@
+<form novalidate (ngSubmit)="onSubmit()" [formGroup]="formUpdateDossier" (keydown.enter)="$event.preventDefault()">
+  <mat-card>
+    <div fxLayout="column" fxLayoutAlign="space-between stretch">
+
+      <div fxLayout="row" fxLayoutAlign="space-between">
+        <!-- Intitulé -->
+        <mat-form-field fxFlex="40">
+          <input autocomplete="off" matInput maxlength="80" placeholder="Intitulé" formControlName="intitule" tabindex="1">
+          <button mat-button *ngIf="formUpdateDossier.get('intitule').value && !viewRight" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formUpdateDossier.get('intitule').setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-hint align="end">
+            {{formUpdateDossier.get('intitule').value.length}} / 80
+          </mat-hint>
+        </mat-form-field>
+
+        <div fxLayout="row" fxFlex="47">
+          <!-- Bénéficiaire part 1 -->
+          <mat-form-field fxFlex="20" class="temp-fix-error-display">
+            <input matInput maxlength="9" autocomplete="off" placeholder="Bénéficiaire" formControlName="referenceBenef" class="siga-uppercase-input"
+              tabindex="2">
+            <mat-error *ngIf="formUpdateDossier.get('referenceBenef').hasError('pattern')">
+              <strong>
+                Format incorrect : 99999999A
+              </strong>
+            </mat-error>
+            <mat-error *ngIf="formUpdateDossier.get('referenceBenef').hasError('benefInactive')">
+              <strong>
+                Ce bénéficiaire est inactif
+              </strong>
+            </mat-error>
+            <mat-error *ngIf="formUpdateDossier.get('referenceBenef').hasError('benefNotFound')">
+              <strong>
+                {{message}}
+              </strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="temp-margin">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+          <!-- Bénéficiaire part 2 -->
+          <mat-form-field fxFlex="78">
+            <input matInput formControlName="benef_libelle">
+          </mat-form-field>
+          <br/>
+        </div>
+
+        <!-- Phase -->
+        <mat-form-field fxFlex="4">
+          <input matInput placeholder="Phase" formControlName="phase">
+          <mat-icon class="icon-info" fxFlex="4" *ngIf="dossierService.dossier?.phase === 'T40'" [matTooltipPosition]="'left'" [matTooltipClass]="'my-tooltip'"
+            matTooltip="Dossier Refusé &#13;&#13; {{libelNature}} &#13; {{nature}} &#13;&#13;{{libelMotif}} &#13; {{motif}} &#13;&#13;">info</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between">
+        <!-- Date de la demande -->
+        <mat-form-field fxFlex="40">
+          <input autocomplete="off" matInput [min]="minDate" [max]="maxDate" [matDatepicker]="dp" placeholder="Date de la demande"
+            tabindex="3" formControlName="dateDemande">
+          <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp></mat-datepicker>
+
+          <mat-error *ngIf="formUpdateDossier.get('dateDemande').hasError('matDatepickerParse')">
+            <strong>
+              Veuillez sélectionner / saisir une date valide.
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="formUpdateDossier.get('dateDemande').hasError('matDatepickerMin')">
+            <strong>
+              Veuillez saisir une date supérieur au 01/01/1950.
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="formUpdateDossier.get('dateDemande').hasError('matDatepickerMax')">
+            <strong>
+              Veuillez saisir une date inférieure à la date du jour.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Origine demande -->
+        <mat-form-field fxFlex="40">
+          <div fxLayout="row">
+            <input matInput placeholder="Origine demande" [matAutocomplete]="origineDemandeAutoComplete" formControlName="origineDemande"
+              tabindex="4">
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !origineDemandeAutoComplete.isOpen, 'mat-select-arrow-up': origineDemandeAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="formUpdateDossier.get('origineDemande').value && !viewRight" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formUpdateDossier.get('origineDemande').setValue(null)">
+            <mat-icon>close</mat-icon>
+          </button>
+
+          <mat-error *ngIf="!formUpdateDossier.get('origineDemande').hasError('required') && formUpdateDossier.get('origineDemande').touched && formUpdateDossier.get('origineDemande').hasError('origineDemandeNotFound')">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-autocomplete #origineDemandeAutoComplete="matAutocomplete" [displayWith]="displayOrigineDemande" [autoActiveFirstOption]="true">
+          <mat-option *ngFor="let origineDemande of filteredOrigineDemandes | async" [value]="origineDemande">
+            <span> {{origineDemande.libelle}} </span>
+          </mat-option>
+        </mat-autocomplete>
+
+        <div fxFlex="5">
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between" *ngIf="dossierService.dossier?.numero_aid != null ">
+        <mat-form-field fxFlex="12">
+          <input matInput placeholder="Numéro du dossier AEAG" formControlName="numero_aid">
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+</form>
+
+<!-- <mat-expansion-panel expanded class="temp-margin">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Informations dossier
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <mat-tab-group class="tab-border">
+    <mat-tab label="Prévisionel">
+      <test [dossier]="dossierService.dossier">
+      </test>
+    </mat-tab>
+    <mat-tab label="Onglet vide de test">
+
+      <p style="padding: 20px">Je suis vide !</p>
+
+    </mat-tab>
+  </mat-tab-group>
+
+</mat-expansion-panel> -->
+
+<!-- <mat-expansion-panel class="temp-margin">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Informations dossier
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <div [fxFlex.xs]="100" [fxFlex.sm]="100" [fxFlex.gt-sm]="100" class="tab-border">
+    <nav mat-tab-nav-bar>
+      <a mat-tab-link [routerLink]="[{ outlets: { 'dossier': ['preDossier'] } }]" routerLinkActive #r1a="routerLinkActive" [active]="r1a.isActive">
+        Prévisionel
+      </a>
+      <a mat-tab-link [routerLink]="[{ outlets: { 'dossier': ['infoSpec'] } }]" routerLinkActive #r1b="routerLinkActive" [active]="r1b.isActive">
+        Infos. Spécifiques
+      </a>
+    </nav>
+
+    <router-outlet name="dossier">
+    </router-outlet>
+  </div>
+</mat-expansion-panel> -->
+
+<!-- <mat-expansion-panel expanded class="temp-margin">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Nature Opération (Temporaire)
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <div [fxFlex.xs]="100" [fxFlex.sm]="100" [fxFlex.gt-sm]="100" class="nav-routes">
+    <nav mat-tab-nav-bar>
+      <a mat-tab-link [routerLink]="[{ outlets: { 'nature': ['montants'] } }]" routerLinkActive #r2a="routerLinkActive" [active]="r2a.isActive">
+        Montants
+      </a>
+      <a mat-tab-link [routerLink]="[{ outlets: { 'nature': ['caracteristiques'] } }]" routerLinkActive #r2b="routerLinkActive"
+        [active]="r2b.isActive">
+        Caractéristiques
+      </a>
+    </nav>
+
+    <router-outlet name="nature">
+    </router-outlet>
+  </div>
+</mat-expansion-panel> -->
+
+<div fxLayout="row" fxLayoutAlign="space-around" class="temp-margin">
+  <!-- Quitter -->
+  <button mat-raised-button (click)="close()" type="button" fxFlex="12" tabindex="6">
+    <em class="ion-close siga-form-cancel"></em>
+  </button>
+  <!-- Valider -->
+  <button mat-raised-button [disabled]="!formUpdateDossier.valid || submitted || !dossierService.dossier?.beneficiaire?.actif || !dossierService.dossier?.beneficiaire == null || message != null"
+    type="submit" fxFlex="12" tabindex="5" (keydown.enter)="onSubmit()" (click)="onSubmit()">
+    <em [ngClass]="(formUpdateDossier.valid)?'ion-checkmark siga-form-confirm':'ion-checkmark siga-form-invalid'"></em>
+  </button>
+  <!-- Refuser || Consulter -->
+  <button #button mat-raised-button [disabled]="!dossierService.dossier" (click)="dossierService.dossier?.phase === 'T40' ? reactiverDossier() : refuserDossier()"
+    (keydown.enter)="dossierService.dossier?.phase === 'T40' ? reactiverDossier() : refuserDossier()" type="button" tabindex="7">
+    <span *ngIf="dossierService.dossier?.phase !== 'T40'">Refuser le dossier</span>
+    <span *ngIf="dossierService.dossier?.phase === 'T40'">Réactiver le dossier</span>
+  </button>
+</div>

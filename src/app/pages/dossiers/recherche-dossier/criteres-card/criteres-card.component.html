@@ -1,0 +1,145 @@
+<mat-card style="padding:5px">
+
+  <div class="siga-spacing-bottom"></div>
+
+  <form novalidate (ngSubmit)="onSubmit()" [formGroup]="formCritere" (keydown.enter)="$event.preventDefault()">
+    <div fxLayout="column" fxLayoutAlign="space-between stretch">
+
+      <div fxLayout="row" fxLayoutAlign="space-around center">
+
+        <!-- Thématique -->
+        <mat-form-field fxFlex="30">
+          <div fxLayout="row">
+            <input matInput placeholder="Thématique" [matAutocomplete]="thematicAutoComplete" formControlName="thematique" tabindex="1">
+            <mat-autocomplete #thematicAutoComplete="matAutocomplete" [displayWith]="displayThematique" [autoActiveFirstOption]="true">
+              <mat-option *ngFor="let thematique of filteredThematiques | async" [value]="thematique">
+                <span> {{thematique.code}} </span>
+                <span> - </span>
+                <span> {{thematique.libelle}} </span>
+              </mat-option>
+            </mat-autocomplete>
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !thematicAutoComplete.isOpen, 'mat-select-arrow-up': thematicAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="formCritere.get('thematique').value" matSuffix mat-icon-button aria-label="Clear" (click)="formCritere.get('thematique').setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!formCritere.get('thematique').hasError('required') && formCritere.get('thematique').touched && formCritere.get('thematique').hasError('thematiqueNotFound')">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Département -->
+        <mat-form-field fxFlex="20">
+          <div fxLayout="row">
+            <input matInput placeholder="Département" [matAutocomplete]="departementAutoComplete" formControlName="dept" tabindex="2">
+            <mat-autocomplete #departementAutoComplete="matAutocomplete" [displayWith]="displayDept" [autoActiveFirstOption]="true">
+              <mat-option *ngFor="let dept of filteredDepts | async" [value]="dept">
+                <span> {{dept.id}} </span>
+                <span> - </span>
+                <span> {{dept.libelle}} </span>
+              </mat-option>
+            </mat-autocomplete>
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !departementAutoComplete.isOpen, 'mat-select-arrow-up': departementAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="formCritere.get('dept').value" matSuffix mat-icon-button aria-label="Clear" (click)="formCritere.get('dept').setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!formCritere.get('dept').hasError('required') && formCritere.get('dept').touched && formCritere.get('dept').hasError('deptNotFound')">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Numéro d'incrément -->
+        <mat-form-field fxFlex="8">
+          <input matInput placeholder="Numéro" autocomplete="off" formControlName="numeroIncrement" tabindex="3" maxlength="5">
+          <button mat-button *ngIf="formCritere.get('numeroIncrement').value" matSuffix mat-icon-button aria-label="Clear" (click)="formCritere.get('numeroIncrement').setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!formCritere.get('numeroIncrement').hasError('required') && formCritere.get('numeroIncrement').touched && formCritere.get('numeroIncrement').hasError('pattern')">
+            <strong>
+              Le format doit être 5 chiffres
+            </strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Responsable technique  -->
+        <mat-form-field fxFlex="27">
+          <div fxLayout="row">
+            <input matInput placeholder="Responsable Technique" [matAutocomplete]="responsableTechAutoComplete" formControlName="responsableTech"
+              tabindex="4">
+            <mat-autocomplete #responsableTechAutoComplete="matAutocomplete" [displayWith]="displayResponsableTech" [autoActiveFirstOption]="true">
+              <mat-option *ngFor="let responsableTech of filteredResponsablesTech | async" [value]="responsableTech">
+                <span> {{responsableTech.prenom}} </span>
+                <span> {{responsableTech.nom}} </span>
+              </mat-option>
+            </mat-autocomplete>
+            <div class="mat-select-arrow-wrapper">
+              <div class="mat-select-arrow" [ngClass]="{'mat-select-arrow-down': !responsableTechAutoComplete.isOpen, 'mat-select-arrow-up': responsableTechAutoComplete.isOpen}"></div>
+            </div>
+          </div>
+          <button mat-button *ngIf="formCritere.get('responsableTech').value" matSuffix mat-icon-button aria-label="Clear" (click)="formCritere.get('responsableTech').setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="!formCritere.get('responsableTech').hasError('required') && formCritere.get('responsableTech').touched && formCritere.get('responsableTech').hasError('responsableTechNotFound')">
+            <strong>
+              Veuillez sélectionner un des choix parmi les options possibles.
+            </strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Bénéficiaire part 1 -->
+      <div fxLayout="row" fxLayoutAlign="center">
+        <mat-form-field class="temp-fix-error-display" fxFlex="10">
+          <input matInput placeholder="Bénéficiaire" autocomplete="off" formControlName="benefNumber" tabindex="5" maxlength="9" class="siga-uppercase-input">
+          <mat-error *ngIf="formCritere.get('benefNumber').hasError('pattern')">
+            <strong>
+              Format incorrect : 99999999A
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="formCritere.get('benefNumber').hasError('benefInactive')">
+            <strong>
+              Ce bénéficiaire est inactif
+            </strong>
+          </mat-error>
+          <mat-error *ngIf="formCritere.get('benefNumber').hasError('benefNotFound')">
+            <strong>
+              {{message}}
+            </strong>
+          </mat-error>
+        </mat-form-field>
+        <div class="hidden">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+        <!-- Bénéficiaire part 2 -->
+        <mat-form-field fxFlex="30">
+          <div fxLayout="row">
+            <input matInput formControlName="benef_libelle">
+          </div>
+        </mat-form-field>
+        <mat-form-field fxFlex="35" class="siga-hidden">
+          <div fxLayout="row">
+            <input matInput>
+          </div>
+        </mat-form-field>
+        <span fxFlex="19" fxLayoutAlign="space-around center">
+          <div fxLayout="row">
+            <button mat-raised-button [disabled]="!formCritere.valid || message != null" type="submit" fxFlex="30" tabindex="6" (keydown.enter)="onSubmit()">
+              <em class="ion-search siga-form-confirm"></em>
+            </button>
+          </div>
+        </span>
+      </div>
+    </div>
+  </form>
+
+  <div class="siga-spacing-bottom"></div>
+</mat-card>
+<div class="siga-spacing-bottom"></div>
